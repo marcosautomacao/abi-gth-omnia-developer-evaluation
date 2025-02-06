@@ -9,6 +9,8 @@ namespace Ambev.DeveloperEvaluation.ORM;
 public class DefaultContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<Sale> Sales { get; set; }
+    public DbSet<Product> Products { get; set; }
 
     public DefaultContext(DbContextOptions<DefaultContext> options) : base(options)
     {
@@ -32,6 +34,17 @@ public class YourDbContextFactory : IDesignTimeDbContextFactory<DefaultContext>
         var builder = new DbContextOptionsBuilder<DefaultContext>();
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+try
+{
+    var npgsqlConnectionStringBuilder = new Npgsql.NpgsqlConnectionStringBuilder(connectionString);
+    Console.WriteLine("Connection string válida.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Erro na connection string: {ex.Message}");
+}
+
+        builder.LogTo(Console.WriteLine);
         builder.UseNpgsql(
                connectionString,
                b => b.MigrationsAssembly("Ambev.DeveloperEvaluation.WebApi")
