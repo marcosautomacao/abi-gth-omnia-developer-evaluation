@@ -1,0 +1,8 @@
+{
+    "dotnet-test-explorer.testProjectPath": "${userHome}/Downloads/abi-gth-omnia-developer-evaluation 5/template/backend/tests/Ambev.DeveloperEvaluation.Unit/Ambev.DeveloperEvaluation.Unit.csproj",
+    "dotnet-test-explorer.autoWatch": true,
+    "dotnet-test-explorer.autoExpandTree": true,
+    "dotnet-test-explorer.treeMode": "merged",
+    "dotnet-test-explorer.showCodeLens": true,
+    "dotnet-test-explorer.runInParallel": true
+}

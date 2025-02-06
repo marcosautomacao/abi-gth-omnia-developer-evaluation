@@ -16,12 +16,23 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        if (args.Contains("--wait-for-debugger"))
+        {
+            Console.WriteLine("Aguardando debugger...");
+            while (!System.Diagnostics.Debugger.IsAttached)
+            {
+                Thread.Sleep(1000);
+            }
+        }
+        
+        Console.WriteLine("Debbuger atachado");
+
         try
         {
-            Log.Information("Starting web application");
-
-            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+            var builder = WebApplication.CreateBuilder(args);
             builder.AddDefaultLogging();
+
+            Log.Information("Starting web application");
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
