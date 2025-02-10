@@ -73,7 +73,8 @@ docker logs developer-evaluation-api
   2. Mapped to CreateSaleCommand
   3. Validates product quantities (max 20 per item)
   4. Creates sale record with items
-  5. Returns created sale details
+  5. Publishes SaleCreatedEvent via EventPublisher
+  6. Returns created sale details
 
 ### 2. Get Sale
 - Endpoint: GET /api/sales/{id}
@@ -88,21 +89,26 @@ docker logs developer-evaluation-api
   1. Update request processed
   2. Validates updated quantities
   3. Updates sale and items
-  4. Returns updated sale details
+  4. Publishes SaleUpdatedEvent via EventPublisher
+  5. Returns updated sale details
 
 ### 4. Delete Sale
 - Endpoint: DELETE /api/sales/{id}
 - Flow:
   1. Delete request processed
   2. Sale and related items removed
-  3. Returns success confirmation
+  3. Publishes SaleDeletedEvent via EventPublisher
+  4. Returns success confirmation
 
 ## Common Features
-- All endpoints implement proper error handling
-- Validation occurs at both request and domain levels
-- AutoMapper used for DTO mappings
-- Mediator pattern implements command/handler pattern
-- Repository pattern manages data access
+- All endpoints implement proper error handling.
+- Validation occurs at both request and domain levels.
+- AutoMapper is used for DTO mappings.
+- Mediator pattern implements command/handler pattern.
+- Repository pattern manages data access.
+- Event Publication:
+- In operations related to Sales (Cart), corresponding events (SaleCreatedEvent, SaleUpdatedEvent, SaleDeletedEvent)                 are published via the EventPublisher to allow asynchronous processing and integration with other systems.
+- API response formatting and logging are implemented consistently.
 
 # How this development was structured
 
@@ -134,6 +140,9 @@ docker logs developer-evaluation-api
 /ORM/
 - DefaultContext.cs - EF Core DbContext
 - Repositories/ - Implementation of domain repositories
+
+/INFRASTRUCTURE/
+- EventPublisher.cs - Event publishing logic
 
 /tests/Unit/
 - Handler unit tests

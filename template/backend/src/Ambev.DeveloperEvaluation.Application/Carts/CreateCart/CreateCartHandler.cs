@@ -5,6 +5,7 @@ using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Application.Products.GetProduct;
 using Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
+using Ambev.DeveloperEvaluation.Application.Interfaces;
 
 namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 {
@@ -13,12 +14,14 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         private readonly ISaleRepository _saleRepository;
         private readonly IMapper _mapper;
         private readonly IMediator _mediator;
+        private readonly IEventPublisher _eventPublisher;
 
-        public CreateSaleHandler(ISaleRepository saleRepository, IMapper mapper, IMediator mediator)
+        public CreateSaleHandler(ISaleRepository saleRepository, IMapper mapper, IMediator mediator, IEventPublisher eventPublisher)
         {
             _saleRepository = saleRepository;
             _mapper = mapper;
             _mediator = mediator;
+            _eventPublisher = eventPublisher;
         }
 
         public async Task<CreateSaleResult> Handle(CreateSaleCommand command, CancellationToken cancellationToken)
@@ -66,6 +69,13 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
 
             var createdSale = await _saleRepository.AddAsync(sale, cancellationToken);
             var result = _mapper.Map<CreateSaleResult>(createdSale);
+
+            _eventPublisher.PublishAsync(new SaleCreatedEvent 
+            { 
+                SaleId = sale.Id,
+                CreatedAt = DateTime.UtcNow
+            });
+
             return result;
         }
 
