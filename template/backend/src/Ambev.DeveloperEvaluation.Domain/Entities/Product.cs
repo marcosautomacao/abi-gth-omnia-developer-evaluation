@@ -9,11 +9,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
     public class Product : BaseEntity
     {
         /// <summary>
-        /// Gets or sets the product Id.
-        /// </summary>
-        public Guid Id { get; set; } = Guid.Empty;
-
-        /// <summary>
         /// Gets or sets the product name.
         /// </summary>
         public string Name { get; set; } = string.Empty;
@@ -29,8 +24,10 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public decimal Price { get; set; }
 
         /// <summary>
-        /// Gets or sets the product count.
+        /// Gets or sets the product Stock.
         /// </summary>
-        public decimal Quantity { get; set; }
+        public decimal Stock { get; set; }
+        public string Category { get; set; }
+        public string Image { get; set; }
     }
 }

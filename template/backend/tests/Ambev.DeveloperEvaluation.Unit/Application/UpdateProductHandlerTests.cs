@@ -33,7 +33,7 @@ public class UpdateProductHandlerTests
             Name = command.Title,
             Description = command.Description,
             Price = command.Price,
-            Quantity = command.Count
+            Stock = command.Stock
         };
 
         var result = new UpdateProductResult { Id = product.Id };

@@ -16,7 +16,6 @@ namespace Ambev.DeveloperEvaluation.Application.Products.UpdateProduct
             _productRepository = productRepository;
             _mapper = mapper;
         }
-
         public async Task<UpdateProductResult> Handle(UpdateProductCommand command, CancellationToken cancellationToken)
         {
             var validator = new UpdateProductCommandValidator();
@@ -26,14 +25,18 @@ namespace Ambev.DeveloperEvaluation.Application.Products.UpdateProduct
                 throw new ValidationException(validationResult.Errors);
 
             var product = await _productRepository.GetByIdAsync(command.Id, cancellationToken);
+            
             if (product == null)
                 throw new KeyNotFoundException($"Product with ID {command.Id} not found");
-
+            
+            // Map command properties to existing product entity
             _mapper.Map(command, product);
+            
             await _productRepository.UpdateAsync(product, cancellationToken);
 
             var result = _mapper.Map<UpdateProductResult>(product);
             return result;
+        
         }
     }
 }

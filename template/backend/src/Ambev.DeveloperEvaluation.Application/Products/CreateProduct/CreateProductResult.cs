@@ -9,6 +9,6 @@ namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
         public string Category { get; set; }
         public string Image { get; set; }
         public decimal Rate { get; set; }
-        public int Count { get; set; }
+        public int Stock { get; set; }
     }
 }

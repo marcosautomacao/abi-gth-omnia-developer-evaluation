@@ -13,7 +13,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct
             RuleFor(x => x.Image).NotEmpty().MaximumLength(200);
             RuleFor(x => x.Rating).NotNull();
             RuleFor(x => x.Rating.Rate).InclusiveBetween(0, 5);
-            RuleFor(x => x.Rating.Count).GreaterThanOrEqualTo(0);
+            RuleFor(x => x.Rating.Stock).GreaterThanOrEqualTo(0);
         }
     }
 }

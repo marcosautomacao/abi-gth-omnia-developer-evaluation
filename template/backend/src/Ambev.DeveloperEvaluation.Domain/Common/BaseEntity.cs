@@ -5,6 +5,10 @@ namespace Ambev.DeveloperEvaluation.Domain.Common;
 public class BaseEntity : IComparable<BaseEntity>
 {
     public Guid Id { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedAt { get; set; }
+    public string CreatedBy { get; set; } = "admin";
+    public string? UpdatedBy { get; set; } = null;
 
     public Task<IEnumerable<ValidationErrorDetail>> ValidateAsync()
     {

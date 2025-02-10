@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Ambev.DeveloperEvaluation.Application.Products.CreateProduct;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
@@ -33,7 +34,7 @@ public class CreateProductHandlerTests
             Name = command.Title,
             Description = command.Description,
             Price = command.Price,
-            Quantity = command.Count
+            Stock = command.Stock
         };
 
         var result = new CreateProductResult { Id = product.Id };
@@ -49,5 +50,20 @@ public class CreateProductHandlerTests
         createResult.Should().NotBeNull();
         createResult.Id.Should().Be(product.Id);
         await _productRepository.Received(1).AddAsync(Arg.Any<Product>(), Arg.Any<CancellationToken>());
+    }
+
+    [Fact]
+    public async Task Handle_ProductQuantityAbove20_ThrowsValidationException()
+    {
+        // Given
+        var command = ProductHandlerTestData.GenerateValidCreateCommand();
+        command. Stock  = 21;
+
+        // When
+        var action = () => _handler.Handle(command, CancellationToken.None);
+
+        // Then
+        await action.Should().ThrowAsync<ValidationException>()
+            .WithMessage("Cannot  Stock  more than 20 items");
     }
 }

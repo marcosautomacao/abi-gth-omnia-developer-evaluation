@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Ambev.DeveloperEvaluation.Application.Sales.GetSale;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
@@ -17,27 +18,96 @@ public class GetSaleHandlerTests
     public GetSaleHandlerTests()
     {
         _saleRepository = Substitute.For<ISaleRepository>();
-        _mapper = Substitute.For<IMapper>();
+        var config = new MapperConfiguration(cfg => 
+        {
+            cfg.AddMaps(typeof(GetSaleProfile).Assembly);
+        });
+        _mapper = config.CreateMapper();
         _handler = new GetSaleHandler(_saleRepository, _mapper);
     }
 
-    [Fact]
-    public async Task Handle_ExistingSale_ReturnsSale()
+    [Theory]
+    [InlineData(3, 0)] // Below 4 items - no discount
+    [InlineData(4, 0.10)] // 4 items - 10% discount
+    [InlineData(9, 0.10)] // Between 4-9 items - 10% discount
+    [InlineData(10, 0.20)] // 10 items - 20% discount
+    [InlineData(15, 0.20)] // Between 10-20 items - 20% discount
+    [InlineData(20, 0.20)] // Maximum 20 items - 20% discount
+    public async Task Handle_SaleWithQuantityBasedDiscount_AppliesCorrectDiscount(int quantity, decimal expectedDiscountRate)
     {
         // Given
         var saleId = Guid.NewGuid();
         var command = new GetSaleCommand { Id = saleId };
-        var sale = new Sale { Id = saleId };
-        var result = new GetSaleResult { Id = saleId };
+        var unitPrice = 100m;
+        
+        var sale = new Sale 
+        { 
+            Id = saleId,
+            Items = new List<SaleItem> 
+            { 
+                new() 
+                { 
+                    ProductId = Guid.NewGuid(),
+                    Quantity = quantity,
+                    UnitPrice = unitPrice
+                } 
+            }
+        };
+
+        var expectedDiscount = unitPrice * quantity * expectedDiscountRate;
+        var expectedTotal = (unitPrice * quantity) - expectedDiscount;
 
         _saleRepository.GetByIdAsync(saleId, Arg.Any<CancellationToken>()).Returns(sale);
-        _mapper.Map<GetSaleResult>(sale).Returns(result);
+        // _mapper.Map<GetSaleResult>(sale).Returns(new GetSaleResult 
+        // { 
+        //     Id = saleId,
+        //     TotalAmount = expectedTotal,
+        //     Products = sale.Items.Select(i => new GetSaleItemResult 
+        //     { 
+        //         ProductId = i.ProductId,
+        //         Quantity = i.Quantity,
+        //         UnitPrice = i.UnitPrice,
+        //         Discount = expectedDiscount,
+        //         TotalAmount = expectedTotal
+        //     }).ToList()
+        // });
 
         // When
-        var getResult = await _handler.Handle(command, CancellationToken.None);
+        var result = await _handler.Handle(command, CancellationToken.None);
 
         // Then
-        getResult.Should().NotBeNull();
-        getResult.Id.Should().Be(saleId);
+        result.TotalAmount.Should().Be(expectedTotal);
+        result.Products.First().Discount.Should().Be(expectedDiscount);
+        result.Products.First().TotalAmount.Should().Be(expectedTotal);
+        result.Products.First().Quantity.Should().Be(quantity);
+        result.Products.First().UnitPrice.Should().Be(unitPrice);
+        result.Products.First().ProductId.Should().Be(sale.Items.First().ProductId);
+        result.Products.First().Discount.Should().Be(expectedDiscount);
+        result.Products.First().TotalAmount.Should().Be(expectedTotal);
+        
     }
-}
+
+    [Fact]
+    public async Task Handle_SaleWithQuantityAbove20_ThrowsValidationException()
+    {
+        // Given
+        var saleId = Guid.NewGuid();
+        var command = new GetSaleCommand { Id = saleId };
+        var sale = new Sale 
+        { 
+            Id = saleId,
+            Items = new List<SaleItem> 
+            { 
+                new() { Quantity = 21 } 
+            }
+        };
+
+        _saleRepository.GetByIdAsync(saleId, Arg.Any<CancellationToken>()).Returns(sale);
+
+        // When
+        var action = () => _handler.Handle(command, CancellationToken.None);
+
+        // Then
+        await action.Should().ThrowAsync<FluentValidation.ValidationException>()
+            .WithMessage("Cannot Sell more than 20 items");
+    }}

@@ -14,7 +14,7 @@ public static class ProductHandlerTestData
         .RuleFor(p => p.Category, f => f.Commerce.Categories(1)[0])
         .RuleFor(p => p.Image, f => f.Image.PicsumUrl())
         .RuleFor(p => p.Price, f => decimal.Parse(f.Commerce.Price(1, 1000)))
-        .RuleFor(p => p.Count, f => f.Random.Number(1, 1000));
+        .RuleFor(p => p.Stock, f => f.Random.Number(1, 1000));
 
     private static readonly Faker<UpdateProductCommand> updateProductFaker = new Faker<UpdateProductCommand>()
         .RuleFor(p => p.Id, f => Guid.NewGuid())
@@ -23,7 +23,7 @@ public static class ProductHandlerTestData
         .RuleFor(p => p.Category, f => f.Commerce.Categories(1)[0])
         .RuleFor(p => p.Image, f => f.Image.PicsumUrl())
         .RuleFor(p => p.Price, f => decimal.Parse(f.Commerce.Price(1, 1000)))
-        .RuleFor(p => p.Count, f => f.Random.Number(1, 1000));
+        .RuleFor(p => p.Stock, f => f.Random.Number(1, 1000));
 
     private static readonly Faker<GetProductCommand> getProductFaker = new Faker<GetProductCommand>()
         .RuleFor(p => p.Id, f => Guid.NewGuid());

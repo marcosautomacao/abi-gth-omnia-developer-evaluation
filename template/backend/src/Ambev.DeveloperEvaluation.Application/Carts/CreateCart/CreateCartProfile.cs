@@ -8,6 +8,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.CreateSale
         public CreateSaleProfile()
         {
             CreateMap<CreateSaleCommand, Sale>()
+                
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => 
                     src.Products.Select(p => new SaleItem { ProductId = p.ProductId, Quantity = p.Quantity })));
 

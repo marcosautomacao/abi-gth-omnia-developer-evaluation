@@ -1,6 +1,6 @@
 using AutoMapper;
 using MediatR;
-using FluentValidation;
+using System.ComponentModel.DataAnnotations;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 
@@ -23,7 +23,7 @@ namespace Ambev.DeveloperEvaluation.Application.Products.CreateProduct
             var validationResult = await validator.ValidateAsync(command, cancellationToken);
 
             if (!validationResult.IsValid)
-                throw new ValidationException(validationResult.Errors);
+                throw new ValidationException(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
 
             var product = _mapper.Map<Product>(command);
             var createdProduct = await _productRepository.AddAsync(product, cancellationToken);

@@ -25,8 +25,12 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.GetSale
                 throw new ValidationException(validationResult.Errors);
 
             var Sale = await _SaleRepository.GetByIdAsync(command.Id, cancellationToken);
+
             if (Sale == null)
                 throw new KeyNotFoundException($"Sale with ID {command.Id} not found");
+            
+            if (Sale.Items.Any(i => i.Quantity > 20))
+                throw new ValidationException($"Cannot Sell more than 20 items");
 
             var result = _mapper.Map<GetSaleResult>(Sale);
             return result;

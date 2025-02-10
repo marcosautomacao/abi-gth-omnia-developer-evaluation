@@ -21,11 +21,6 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         public DateTime SaleDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the customer who made the sale.
-        /// </summary>
-        // public Customer Customer { get; set; }
-
-        /// <summary>
         /// Gets or sets the total sale amount.
         /// </summary>
         public decimal TotalSaleAmount { get; set; }
@@ -38,7 +33,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
         /// <summary>
         /// Gets or sets a value indicating whether the sale is cancelled.
         /// </summary>
-        public bool IsCancelled { get; set; }
+        public bool IsCancelled { get; set; } = false;
 
         public Guid UserId { get; set; }
         
@@ -51,11 +46,13 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
     public class SaleItem
     {
         public Product Product { get; set; }
+        public Sale Sale { get; set; }
         public Guid ProductId { get; set; }
+        public Guid SaleId { get; set; }
         public int Quantity { get; set; }
         public decimal Discount { get; set; }
-        public decimal TotalAmount => Quantity * Product.Price - Discount;
-        public Guid SaleId { get; set; }
-        public Sale Sale { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal UnitPrice { get; set; }
+        public string ProductName { get; set; }
     }
 }
