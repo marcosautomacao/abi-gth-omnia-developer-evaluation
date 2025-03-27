@@ -1,3 +1,4 @@
+using Ambev.DeveloperEvaluation.Application.Interfaces;
 using Ambev.DeveloperEvaluation.Application.Sales.UpdateSale;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
@@ -13,12 +14,13 @@ public class UpdateSaleHandlerTests
     private readonly ISaleRepository _saleRepository;
     private readonly IMapper _mapper;
     private readonly UpdateSaleHandler _handler;
+    private readonly IEventPublisher _eventPublisher;
 
     public UpdateSaleHandlerTests()
     {
         _saleRepository = Substitute.For<ISaleRepository>();
         _mapper = Substitute.For<IMapper>();
-        _handler = new UpdateSaleHandler(_saleRepository, _mapper);
+        _handler = new UpdateSaleHandler(_saleRepository, _mapper, _eventPublisher);
     }
 
     [Fact]

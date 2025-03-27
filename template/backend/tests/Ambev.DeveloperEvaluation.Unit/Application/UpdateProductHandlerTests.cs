@@ -30,7 +30,6 @@ public class UpdateProductHandlerTests
         var product = new Product
         {
             Id = command.Id,
-            Name = command.Title,
             Description = command.Description,
             Price = command.Price,
             Stock = command.Stock

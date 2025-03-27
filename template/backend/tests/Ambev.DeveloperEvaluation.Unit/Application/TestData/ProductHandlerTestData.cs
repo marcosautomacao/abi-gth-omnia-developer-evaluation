@@ -18,7 +18,6 @@ public static class ProductHandlerTestData
 
     private static readonly Faker<UpdateProductCommand> updateProductFaker = new Faker<UpdateProductCommand>()
         .RuleFor(p => p.Id, f => Guid.NewGuid())
-        .RuleFor(p => p.Title, f => f.Commerce.ProductName())
         .RuleFor(p => p.Description, f => f.Commerce.ProductDescription())
         .RuleFor(p => p.Category, f => f.Commerce.Categories(1)[0])
         .RuleFor(p => p.Image, f => f.Image.PicsumUrl())

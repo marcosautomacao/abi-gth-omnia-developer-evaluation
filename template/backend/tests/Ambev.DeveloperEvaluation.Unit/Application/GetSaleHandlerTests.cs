@@ -39,52 +39,66 @@ public class GetSaleHandlerTests
         var saleId = Guid.NewGuid();
         var command = new GetSaleCommand { Id = saleId };
         var unitPrice = 100m;
-        
-        var sale = new Sale 
-        { 
+    
+        var sale = new Sale
+        {
             Id = saleId,
-            Items = new List<SaleItem> 
-            { 
-                new() 
-                { 
+            Items = new List<SaleItem>
+            {
+                new()
+                {
                     ProductId = Guid.NewGuid(),
                     Quantity = quantity,
                     UnitPrice = unitPrice
-                } 
+                }
             }
         };
-
+    
         var expectedDiscount = unitPrice * quantity * expectedDiscountRate;
         var expectedTotal = (unitPrice * quantity) - expectedDiscount;
-
+    
         _saleRepository.GetByIdAsync(saleId, Arg.Any<CancellationToken>()).Returns(sale);
-        // _mapper.Map<GetSaleResult>(sale).Returns(new GetSaleResult 
-        // { 
-        //     Id = saleId,
-        //     TotalAmount = expectedTotal,
-        //     Products = sale.Items.Select(i => new GetSaleItemResult 
-        //     { 
-        //         ProductId = i.ProductId,
-        //         Quantity = i.Quantity,
-        //         UnitPrice = i.UnitPrice,
-        //         Discount = expectedDiscount,
-        //         TotalAmount = expectedTotal
-        //     }).ToList()
-        // });
+    
+        // Configure AutoMapper to map the Sale to GetSaleResult
+        var mapperConfig = new MapperConfiguration(cfg =>
+        {
+            cfg.AddProfile<GetSaleProfile>();
+        });
+        var mapper = mapperConfig.CreateMapper();
+    
+    var expectedResult = new GetSaleResult();
+        try {
 
+        expectedResult = mapper.Map<GetSaleResult>(sale);
+        }
+        catch (Exception e) 
+        {
+            Console.WriteLine(e);
+            
+            }
+
+        expectedResult.TotalAmount = expectedTotal;
+    
+        // Ensure Products is not null
+        expectedResult.Products ??= new List<GetSaleItemResult>();
+    
+        foreach (var p in expectedResult.Products)
+        {
+            p.Discount = unitPrice * quantity * expectedDiscountRate;
+            p.TotalAmount = (unitPrice * quantity) - (unitPrice * quantity * expectedDiscountRate);
+        }
+    
         // When
         var result = await _handler.Handle(command, CancellationToken.None);
-
+    
         // Then
         result.TotalAmount.Should().Be(expectedTotal);
-        result.Products.First().Discount.Should().Be(expectedDiscount);
-        result.Products.First().TotalAmount.Should().Be(expectedTotal);
-        result.Products.First().Quantity.Should().Be(quantity);
-        result.Products.First().UnitPrice.Should().Be(unitPrice);
-        result.Products.First().ProductId.Should().Be(sale.Items.First().ProductId);
-        result.Products.First().Discount.Should().Be(expectedDiscount);
-        result.Products.First().TotalAmount.Should().Be(expectedTotal);
-        
+        var product = result.Products.First();
+        product.Discount.Should().Be(expectedDiscount);
+        product.TotalAmount.Should().Be(expectedTotal);
+        product.Quantity.Should().Be(quantity);
+        product.UnitPrice.Should().Be(unitPrice);
+        product.ProductId.Should().Be(sale.Items.First().ProductId);
     }
 
     [Fact]

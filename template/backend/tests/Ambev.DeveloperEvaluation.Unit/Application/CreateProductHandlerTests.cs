@@ -28,6 +28,7 @@ public class CreateProductHandlerTests
     {
         // Given
         var command = ProductHandlerTestData.GenerateValidCreateCommand();
+        command.Stock = 19;
         var product = new Product
         {
             Id = Guid.NewGuid(),

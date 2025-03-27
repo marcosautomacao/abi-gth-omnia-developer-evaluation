@@ -1,0 +1,19 @@
+psql -h localhost -p 5432 -U developer --d developer_evaluation
+
+docker exec -it ambev_developer_evaluation_database psql -U developer -d developer_evaluation -c "\dt"
+
+docker exec -it ambev_developer_evaluation_database psql -U developer -d developer_evaluation -c "SELECT * FROM PRODUCTS"
+
+dotnet tool install --global dotnet-ef
+
+dotnet ef database update --project template/backend/src/Ambev.DeveloperEvaluation.ORM --startup-project template/backend/src/Ambev.DeveloperEvaluation.WebApi
+
+dotnet ef migrations add InitialMigration --project template/backend/src/Ambev.DeveloperEvaluation.ORM --startup-project template/backend/src/Ambev.DeveloperEvaluation.WebApi
+
+dotnet ef migrations add SeedInitialData3 --project template/backend/src/Ambev.DeveloperEvaluation.ORM --startup-project template/backend/src/Ambev.DeveloperEvaluation.WebApi
+
+dotnet ef migrations remove --project template/backend/src/Ambev.DeveloperEvaluation.ORM --startup-project template/backend/src/Ambev.DeveloperEvaluation.WebApi
+
+dotnet ef database drop --project template/backend/src/Ambev.DeveloperEvaluation.ORM --startup-project template/backend/src/Ambev.DeveloperEvaluation.WebApi
+
+docker exec -it ambev_developer_evaluation_database psql -U developer -d developer_evaluation -c "SELECT * FROM Products;"

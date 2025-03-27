@@ -1,3 +1,4 @@
+using Ambev.DeveloperEvaluation.Application.Interfaces;
 using Ambev.DeveloperEvaluation.Application.Sales.DeleteSale;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
@@ -11,11 +12,13 @@ public class DeleteSaleHandlerTests
 {
     private readonly ISaleRepository _saleRepository;
     private readonly DeleteSaleHandler _handler;
+    private readonly IEventPublisher _eventPublisher;
 
     public DeleteSaleHandlerTests()
     {
         _saleRepository = Substitute.For<ISaleRepository>();
-        _handler = new DeleteSaleHandler(_saleRepository);
+        _eventPublisher = Substitute.For<IEventPublisher>();
+        _handler = new DeleteSaleHandler(_saleRepository, _eventPublisher);
     }
 
     [Fact]
