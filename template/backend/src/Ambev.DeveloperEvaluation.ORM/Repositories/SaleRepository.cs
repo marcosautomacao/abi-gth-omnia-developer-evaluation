@@ -17,6 +17,11 @@ namespace Ambev.DeveloperEvaluation.ORM.Repositories
             _context = context;
         }
 
+        public IQueryable<Sale> GetQueryable()
+        {
+            return _context.Sales.Include(s => s.Items).AsQueryable();
+        }
+
         public async Task<IEnumerable<Sale>> GetAllAsync()
         {
             return await _context.Sales

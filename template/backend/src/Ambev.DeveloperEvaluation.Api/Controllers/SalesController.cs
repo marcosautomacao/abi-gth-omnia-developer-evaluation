@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ambev.DeveloperEvaluation.Application.Common.Models;
+using Ambev.DeveloperEvaluation.Application.Sales.Commands.CancelSale;
 using Ambev.DeveloperEvaluation.Application.Sales.Commands.CreateSale;
+using Ambev.DeveloperEvaluation.Application.Sales.Commands.UpdateSaleItemQuantity;
 using Ambev.DeveloperEvaluation.Application.Sales.Dtos;
+using Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSaleById;
 using Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -36,14 +40,32 @@ namespace Ambev.DeveloperEvaluation.API.Controllers
         }
 
         /// <summary>
-        /// Gets all sales
+        /// Gets all sales with pagination, sorting, and filtering
         /// </summary>
-        /// <returns>List of sales</returns>
+        /// <param name="pageNumber">Page number (default: 1)</param>
+        /// <param name="pageSize">Page size (default: 10)</param>
+        /// <param name="searchTerm">Optional search term to filter results</param>
+        /// <param name="sortBy">Sort field (date, number, customer, amount)</param>
+        /// <param name="sortDescending">Sort direction (default: false)</param>
+        /// <returns>Paginated list of sales</returns>
         [HttpGet]
-        [ProducesResponseType(typeof(IEnumerable<SaleDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAll()
+        [ProducesResponseType(typeof(PaginatedList<SaleDto>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAll(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string searchTerm = null,
+            [FromQuery] string sortBy = null,
+            [FromQuery] bool sortDescending = false)
         {
-            var query = new GetSalesQuery();
+            var query = new GetSalesQuery
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                SearchTerm = searchTerm,
+                SortBy = sortBy,
+                SortDescending = sortDescending
+            };
+
             var result = await _mediator.Send(query);
             return Ok(result);
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 
@@ -7,6 +8,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Repositories
 {
     public interface ISaleRepository
     {
+        IQueryable<Sale> GetQueryable();
         Task<IEnumerable<Sale>> GetAllAsync();
         Task<Sale> GetByIdAsync(Guid id);
         Task<Sale> GetBySaleNumberAsync(string saleNumber);
