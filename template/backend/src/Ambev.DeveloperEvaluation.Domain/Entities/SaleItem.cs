@@ -91,5 +91,18 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities
                 AddDomainEvent(new SaleItemModifiedEvent(Id, SaleId));
             }
         }
+
+        public void UpdateUnitPrice(decimal newUnitPrice)
+        {
+            if (newUnitPrice <= 0)
+                throw new ArgumentException("Unit price must be greater than zero", nameof(newUnitPrice));
+
+            if (newUnitPrice != UnitPrice)
+            {
+                UnitPrice = newUnitPrice;
+                CalculateTotalAmount();
+                AddDomainEvent(new SaleItemModifiedEvent(Id, SaleId));
+            }
+        }
     }
 } 
