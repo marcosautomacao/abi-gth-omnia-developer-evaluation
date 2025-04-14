@@ -22,6 +22,9 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Commands.UpdateSaleItemQua
             if (sale == null)
                 throw new InvalidOperationException($"Sale with number {request.SaleNumber} not found");
 
+            if (sale.IsCancelled)
+                throw new InvalidOperationException("Cannot update items in a cancelled sale");
+
             var item = sale.Items.FirstOrDefault(i => i.ProductId == request.ProductId);
             if (item == null)
                 throw new InvalidOperationException($"Product {request.ProductId} not found in sale {request.SaleNumber}");
