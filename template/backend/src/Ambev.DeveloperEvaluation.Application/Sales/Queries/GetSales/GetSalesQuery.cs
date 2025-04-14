@@ -10,8 +10,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 10;
         public string SearchTerm { get; set; }
-        public string SortBy { get; set; } = "date"; // Default sort by date
-        public bool SortDescending { get; set; } = true; // Default newest first
+        public string SortBy { get; set; } = "date"; 
+        public bool SortDescending { get; set; } = true; 
         public SaleFilterModel Filters { get; set; } = new();
 
         public static class SortByOptions

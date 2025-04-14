@@ -29,7 +29,6 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales
 
             query = ApplyFilters(query, request.Filters);
 
-            // Apply search filter
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
                 var searchTerm = request.SearchTerm.ToLower();
@@ -40,10 +39,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales
                     s.Items.Any(i => i.ProductName.ToLower().Contains(searchTerm)));
             }
 
-            // Apply sorting
             query = ApplySorting(query, request.SortBy, request.SortDescending);
 
-            // Project to DTO and paginate
             var dtoQuery = query.ProjectTo<SaleDto>(_mapper.ConfigurationProvider);
             
             return await PaginatedList<SaleDto>.CreateAsync(
@@ -121,7 +118,7 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales
                 GetSalesQuery.SortByOptions.Status => sortDescending
                     ? query.OrderByDescending(s => s.IsCancelled)
                     : query.OrderBy(s => s.IsCancelled),
-                _ => query.OrderByDescending(s => s.SaleDate) // Default sorting
+                _ => query.OrderByDescending(s => s.SaleDate) 
             };
 
             return query;
