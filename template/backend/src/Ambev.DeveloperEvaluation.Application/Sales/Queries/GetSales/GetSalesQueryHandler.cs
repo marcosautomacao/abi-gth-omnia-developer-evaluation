@@ -27,6 +27,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales
         {
             var query = _saleRepository.GetQueryable();
 
+            query = ApplyFilters(query, request.Filters);
+
             // Apply search filter
             if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             {
@@ -34,7 +36,8 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales
                 query = query.Where(s =>
                     s.SaleNumber.ToLower().Contains(searchTerm) ||
                     s.CustomerName.ToLower().Contains(searchTerm) ||
-                    s.BranchName.ToLower().Contains(searchTerm));
+                    s.BranchName.ToLower().Contains(searchTerm) ||
+                    s.Items.Any(i => i.ProductName.ToLower().Contains(searchTerm)));
             }
 
             // Apply sorting
@@ -49,6 +52,50 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales
                 request.PageSize);
         }
 
+        private static IQueryable<Domain.Entities.Sale> ApplyFilters(
+            IQueryable<Domain.Entities.Sale> query,
+            SaleFilterModel filters)
+        {
+            if (filters == null) return query;
+
+            if (filters.StartDate.HasValue)
+            {
+                query = query.Where(s => s.SaleDate >= filters.StartDate.Value);
+            }
+
+            if (filters.EndDate.HasValue)
+            {
+                query = query.Where(s => s.SaleDate <= filters.EndDate.Value);
+            }
+
+            if (filters.MinAmount.HasValue)
+            {
+                query = query.Where(s => s.TotalAmount >= filters.MinAmount.Value);
+            }
+
+            if (filters.MaxAmount.HasValue)
+            {
+                query = query.Where(s => s.TotalAmount <= filters.MaxAmount.Value);
+            }
+
+            if (filters.CustomerId.HasValue)
+            {
+                query = query.Where(s => s.CustomerId == filters.CustomerId.Value);
+            }
+
+            if (filters.BranchId.HasValue)
+            {
+                query = query.Where(s => s.BranchId == filters.BranchId.Value);
+            }
+
+            if (filters.IsCancelled.HasValue)
+            {
+                query = query.Where(s => s.IsCancelled == filters.IsCancelled.Value);
+            }
+
+            return query;
+        }
+
         private static IQueryable<Domain.Entities.Sale> ApplySorting(
             IQueryable<Domain.Entities.Sale> query,
             string sortBy,
@@ -56,18 +103,24 @@ namespace Ambev.DeveloperEvaluation.Application.Sales.Queries.GetSales
         {
             query = (sortBy?.ToLower()) switch
             {
-                "date" => sortDescending 
+                GetSalesQuery.SortByOptions.Date => sortDescending 
                     ? query.OrderByDescending(s => s.SaleDate)
                     : query.OrderBy(s => s.SaleDate),
-                "number" => sortDescending
+                GetSalesQuery.SortByOptions.Number => sortDescending
                     ? query.OrderByDescending(s => s.SaleNumber)
                     : query.OrderBy(s => s.SaleNumber),
-                "customer" => sortDescending
+                GetSalesQuery.SortByOptions.Customer => sortDescending
                     ? query.OrderByDescending(s => s.CustomerName)
                     : query.OrderBy(s => s.CustomerName),
-                "amount" => sortDescending
+                GetSalesQuery.SortByOptions.Branch => sortDescending
+                    ? query.OrderByDescending(s => s.BranchName)
+                    : query.OrderBy(s => s.BranchName),
+                GetSalesQuery.SortByOptions.Amount => sortDescending
                     ? query.OrderByDescending(s => s.TotalAmount)
                     : query.OrderBy(s => s.TotalAmount),
+                GetSalesQuery.SortByOptions.Status => sortDescending
+                    ? query.OrderByDescending(s => s.IsCancelled)
+                    : query.OrderBy(s => s.IsCancelled),
                 _ => query.OrderByDescending(s => s.SaleDate) // Default sorting
             };
 

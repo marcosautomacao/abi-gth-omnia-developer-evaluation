@@ -61,6 +61,7 @@ public class Program
                 app.UseSwaggerUI();
             }
 
+            app.UseMiddleware<ValidationExceptionMiddleware>();
             app.UseErrorHandling();
 
             app.UseHttpsRedirection();
